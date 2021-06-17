@@ -4,12 +4,12 @@
 
 #include <gtest/gtest.h>
 
-TEST(EmdIntentRecognizerTest, textParse) 
+TEST(EmdIntentRecognizerTest, vecParseText) 
 { 
     EmdIntentRecognizer oEIR("../data/Reference.csv");
     std::string strInput = "Testing the parsing function";
     std::vector<std::string> vecProcessedStr = {"Testing","the","parsing","function"};
-    std::vector<std::string> vecRet = oEIR.textParse(strInput);
+    std::vector<std::string> vecRet = oEIR.vecParseText(strInput);
     ASSERT_EQ(vecRet, vecProcessedStr);
 }
 
@@ -29,7 +29,7 @@ TEST(EmdIntentRecognizerTest, strGetIntent)
     ASSERT_EQ("Get Fact", oEIR.strGetIntent("Do you want to hear an interesting fact ?"));
 }
 
-TEST(EmdIntentRecognizerTest, get_term_count) 
+TEST(EmdIntentRecognizerTest, vecGetTermCount) 
 { 
     EmdIntentRecognizer oEIR("../data/Reference.csv");
     std::vector<std::vector<double> > vfvInput;
@@ -38,7 +38,7 @@ TEST(EmdIntentRecognizerTest, get_term_count)
     vfvInput.push_back({0.0,0.0,0.0,0.0,1.0});
     
     std::vector<double> vecExpOutput = {1,1,0,0,2} ;
-    ASSERT_EQ(vecExpOutput, oEIR.get_term_count(vfvInput) );
+    ASSERT_EQ(vecExpOutput, oEIR.vecGetTermCount(vfvInput) );
 }
 
 TEST(EmdIntentRecognizerTest, vecParseReferenceData) 
@@ -48,12 +48,12 @@ TEST(EmdIntentRecognizerTest, vecParseReferenceData)
     ASSERT_EQ(oEIR.m_vecReferenceData.size(), oEIR.vecParseReferenceData().size());
 }
 
-TEST(EmdIntentRecognizerTest, get_tf) 
+TEST(EmdIntentRecognizerTest, vecGetTf) 
 { 
     EmdIntentRecognizer oEIR("../data/Reference.csv");
     std::vector<double> vecInput = {2.0,0.0,0.0,2.0,1.0};
     std::vector<double> vecExp = {0.4,0.0,0.0,0.4,0.2};
-    ASSERT_EQ(vecExp, oEIR.get_tf(vecInput));
+    ASSERT_EQ(vecExp, oEIR.vecGetTf(vecInput));
 }
 
 

@@ -10,7 +10,6 @@ using namespace std;
 EmdIntentRecognizer::EmdIntentRecognizer(std::string strFileName)
 {
     CsvReader fReferenceData(strFileName);
-
     m_mapReferenceData = fReferenceData.mapGetReference();
     m_vecReferenceData = fReferenceData.vecGetStrings();
 }
@@ -19,19 +18,17 @@ EmdIntentRecognizer::EmdIntentRecognizer(std::string strFileName)
 /**
  * Parses the string to a list of words
  * Args: 
- *     bigString - Sentence to be split into words
+ *     strInput - Sentence to be split into words
  * Return: 
  *     A vector of words
  */
-std::vector<std::string> EmdIntentRecognizer::textParse(std::string & bigString)
+std::vector<std::string> EmdIntentRecognizer::vecParseText(std::string & strInput)
 {
-    std::vector<std::string> vec;
-    boost::tokenizer<> tok(bigString);
-    for(boost::tokenizer<>::iterator beg = tok.begin(); beg != tok.end(); ++ beg)
-    {
-        vec.push_back(*beg);
-    }
-    return vec;
+    std::vector<std::string> vecTok;
+    boost::tokenizer<> tok(strInput);
+    for(boost::tokenizer<>::iterator itr = tok.begin(); itr != tok.end(); ++ itr)
+        vecTok.push_back(*itr);
+    return vecTok;
 }
 
 /**
@@ -39,34 +36,34 @@ std::vector<std::string> EmdIntentRecognizer::textParse(std::string & bigString)
  * Args: 
  *     rawDataSet - A vector of strings reads from the data file
  */
-void EmdIntentRecognizer::createVocabList(std::vector<std::vector<std::string>> rawDataSet)
+void EmdIntentRecognizer::vCreateVocabList(std::vector<std::vector<std::string>> vfvData)
 {
-    std::set<std::string> vocabListSet;
-    for (std::vector<std::string> document : rawDataSet)
+    std::set<std::string> setVocabListSet;
+    for (std::vector<std::string> vecDocument : vfvData)
     {
-        for (std::string word : document)
-            vocabListSet.insert(word);
+        for (std::string strWord : vecDocument)
+            setVocabListSet.insert(strWord);
     }
-    std::copy(vocabListSet.begin(), vocabListSet.end(), std::back_inserter(vocabList));
+    std::copy(setVocabListSet.begin(), setVocabListSet.end(), std::back_inserter(m_vecVocabList));
 }
 
 /**
  * Converts the list of words to a vector 
  * Args: 
- *     inputSet - List of words parsed earlier by the textparser
+ *     inputSet - List of words parsed earlier by the vecParseText
  * Return: 
  *     A vector representing the list of words
  */
-std::vector<double> EmdIntentRecognizer::bagOfWords2VecMN(std::vector<std::string> & inputSet)
+std::vector<double> EmdIntentRecognizer::vecBagOfWords2Vec(std::vector<std::string> & vecInput)
 {
-    std::vector<double> returnVec(vocabList.size(), 0);
-    for (std::string word : inputSet)
+    std::vector<double> vecReturn(m_vecVocabList.size(), 0);
+    for (std::string strWord : vecInput)
     {
-        size_t idx = std::find(vocabList.begin(), vocabList.end(), word) - vocabList.begin();
-        if (idx != vocabList.size())
-            returnVec.at(idx) += 1;
+        size_t idx = std::find(m_vecVocabList.begin(), m_vecVocabList.end(), strWord) - m_vecVocabList.begin();
+        if (idx != m_vecVocabList.size())
+            vecReturn.at(idx) += 1;
     }
-    return returnVec;
+    return vecReturn;
 }
 
 /**
@@ -76,37 +73,35 @@ std::vector<double> EmdIntentRecognizer::bagOfWords2VecMN(std::vector<std::strin
  * Return: 
  *     A list of vectors
  */
-auto EmdIntentRecognizer::vec2mat(std::vector<std::vector<std::string>> rawDataSet)
+std::vector<std::vector<double>> EmdIntentRecognizer::vfvVector2Mat(std::vector<std::vector<std::string>> vfvDataStr)
 {
-    createVocabList(rawDataSet);
+    vCreateVocabList(vfvDataStr);
     int cnt(0);
-    for (auto it = rawDataSet.begin(); it != rawDataSet.end(); ++ it)
+    for (auto it = vfvDataStr.begin(); it != vfvDataStr.end(); ++ it)
     {
         cnt ++;
-        std::cout << cnt << "\r";
-        //std::cout.flush();
-        dataMat.push_back(bagOfWords2VecMN(*it));
+        m_vfvDataMat.push_back(vecBagOfWords2Vec(*it));
     }
-    return dataMat;
+    return m_vfvDataMat;
 }
 
 /**
  * Calculates the cosine similarity between 2 vectors
  * Args: 
- *     v1 - input vector 1
- *     v2 - input vector 2
+ *     vecData1 - input vector 1
+ *     vecData2 - input vector 2
  * Return: 
  *     Similaity value
  */
-double EmdIntentRecognizer::cosine_similarity(std::vector<double> &v1, std::vector<double> &v2)
+double EmdIntentRecognizer::dGetCosineSimilarity(std::vector<double> &vecData1, std::vector<double> &vecData2)
 {
     double d1, d2, d3 = 0;
-    unsigned int len = v1.size();
+    unsigned int len = vecData1.size();
     for (unsigned int i = 0; i < len; ++i)
     {
-        d1 += (v1[i] * v2[i]);
-        d2 += (v1[i] * v1[i]);
-        d3 += (v2[i] * v2[i]);
+        d1 += (vecData1[i] * vecData2[i]);
+        d2 += (vecData1[i] * vecData1[i]);
+        d3 += (vecData2[i] * vecData2[i]);
     }
     return d1 / (sqrt(d2) * sqrt(d3));
 }
@@ -118,14 +113,14 @@ double EmdIntentRecognizer::cosine_similarity(std::vector<double> &v1, std::vect
  * Return: 
  *     Count of the number of terms in the vector
  */
-std::vector<double> EmdIntentRecognizer::get_term_count(std::vector<std::vector<double>> data)
+std::vector<double> EmdIntentRecognizer::vecGetTermCount(std::vector<std::vector<double>> vfvData)
 {
-    std::vector<double> term_count(data[0].size(), 0);
-    for(int i=0; i<data.size(); i++)
+    std::vector<double> term_count(vfvData[0].size(), 0);
+    for(int i=0; i<vfvData.size(); i++)
     {
-        for(int j=0; j<data[i].size(); j++)
+        for(int j=0; j<vfvData[i].size(); j++)
         {
-            auto val = data[i][j]>1? 1: data[i][j];
+            auto val = vfvData[i][j]>1? 1: vfvData[i][j];
             term_count[j]+=val;
         }
     }
@@ -139,13 +134,11 @@ std::vector<double> EmdIntentRecognizer::get_term_count(std::vector<std::vector<
  */
 void EmdIntentRecognizer::vGenIDF(std::vector< std::vector<double>> data)
 {
-    auto val = get_term_count(data);
+    auto val = vecGetTermCount(data);
     std::vector<double> ret;
     double row = (double)data.size();
     for(auto temp: val)
-    {
         ret.push_back(log(row/temp));
-    }
 
     mIDF = ret;
 }
@@ -157,19 +150,15 @@ void EmdIntentRecognizer::vGenIDF(std::vector< std::vector<double>> data)
  * Return: 
  *     A vector containing the frequency of terms
  */
-std::vector<double> EmdIntentRecognizer::get_tf(std::vector<double> data)
+std::vector<double> EmdIntentRecognizer::vecGetTf(std::vector<double> data)
 {
     double size = 0;
     for(double val: data)
-    {
         size+= val;
-    } 
 
     std::vector<double> ret;
     for(auto val: data)
-    {
         ret.push_back(val/size);
-    }
 
     return ret;
 }
@@ -201,15 +190,13 @@ std::vector<double> EmdIntentRecognizer::vecIdfMutiplier(std::vector<double> vec
  * Parse all the sentences to a list of list of words
  *
  * Return: 
- *     A list of list of words after being parsed using textparse
+ *     A list of list of words after being parsed using vecParseText
  */
 std::vector<std::vector<std::string>> EmdIntentRecognizer::vecParseReferenceData()
 {
     std::vector<std::vector<std::string>> vecParsedData;
     for(auto strElem: m_vecReferenceData)
-    {
-        vecParsedData.push_back( textParse(strElem) );
-    }
+        vecParsedData.push_back( vecParseText(strElem) );
 
     return vecParsedData;
 }
@@ -220,8 +207,8 @@ std::vector<std::vector<std::string>> EmdIntentRecognizer::vecParseReferenceData
 void EmdIntentRecognizer::vBuild()
 {
     auto processeData = vecParseReferenceData();
-    dataMat = vec2mat(processeData);
-    vGenIDF(dataMat);
+    m_vfvDataMat = vfvVector2Mat(processeData);
+    vGenIDF(m_vfvDataMat);
 }
 
 /**
@@ -238,21 +225,19 @@ double EmdIntentRecognizer::dGetSimilarity(std::string strInp, std::string strRe
     boost::algorithm::to_lower(strReference);
 
     if(mIDF.empty())
-    {
         vBuild();
-    }
 
     std::string strIntent;
 
-    auto vecStr = textParse(strInp);
-    auto vInput = get_tf( bagOfWords2VecMN( vecStr ) );
+    auto vecStr = vecParseText(strInp);
+    auto vInput = vecGetTf( vecBagOfWords2Vec( vecStr ) );
     vInput = vecIdfMutiplier( vInput );
 
-    vecStr = textParse(strReference);
-    auto vRef = get_tf( bagOfWords2VecMN(vecStr) );
+    vecStr = vecParseText(strReference);
+    auto vRef = vecGetTf( vecBagOfWords2Vec(vecStr) );
     vRef = vecIdfMutiplier( vRef );
 
-    auto dSim = cosine_similarity(vInput, vRef);
+    auto dSim = dGetCosineSimilarity(vInput, vRef);
 
     return dSim;
 }
