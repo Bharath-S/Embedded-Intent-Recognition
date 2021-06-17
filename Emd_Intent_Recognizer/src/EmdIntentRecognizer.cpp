@@ -39,9 +39,7 @@ std::vector<double> EmdIntentRecognizer::bagOfWords2VecMN(std::vector<std::strin
     for (std::string word : inputSet)
     {
         size_t idx = std::find(vocabList.begin(), vocabList.end(), word) - vocabList.begin();
-        if (idx == vocabList.size())
-            std::cout << "word: " << word << "not found" << std::endl;
-        else
+        if (idx != vocabList.size())
             returnVec.at(idx) += 1;
     }
     return returnVec;
@@ -49,7 +47,6 @@ std::vector<double> EmdIntentRecognizer::bagOfWords2VecMN(std::vector<std::strin
 
 auto EmdIntentRecognizer::vec2mat(std::vector<std::vector<std::string>> rawDataSet)
 {
-
     createVocabList(rawDataSet);
     int cnt(0);
     for (auto it = rawDataSet.begin(); it != rawDataSet.end(); ++ it)
@@ -59,7 +56,6 @@ auto EmdIntentRecognizer::vec2mat(std::vector<std::vector<std::string>> rawDataS
         //std::cout.flush();
         dataMat.push_back(bagOfWords2VecMN(*it));
     }
-
     return dataMat;
 }
 

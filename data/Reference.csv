@@ -1,7 +1,11 @@
 Get Weather,What is the weather like today?
-Get Weather,What is the weather like in Paris today?
-Get Weather,What is the weather like in New York today?
+Get Weather City,What is the weather like in Paris today?
+Get Weather City,What is the weather like in Berlin today?
+Get Weather City,What is the weather like in New York today?
+Get Weather City,How is the weather in Pforzheim tomorrow?
+Get Weather City,Is the weather good in Munich now?
 Get Weather,what is the weather like tomorrow
+Get Weather,what is the weather like in the evening
 Get Weather,Is the weather good today?
 Get Weather,Is it raining now?
 Get Weather,Is it snowning in Stuttgart?
@@ -15,4 +19,4 @@ Check calendar,Do I have any apointments for today?
 Check calendar,How does my calender look like?
 Check calendar,When do I have the meeting?
 Get Fact,Tell me an interesting fact.
-
+Get Fact,Do you want to hear an interesting fact?

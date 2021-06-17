@@ -7,6 +7,8 @@ file(GLOB_RECURSE Sources CONFIGURE_DEPENDS "main.cpp")
 
 include_directories(Emd_Intent_Recognizer/header)
 
+add_subdirectory(googletest)
+add_subdirectory(utest)
 add_subdirectory(Emd_Intent_Recognizer)
 
 add_executable(EmbeddedIntentDetection ${Sources})
