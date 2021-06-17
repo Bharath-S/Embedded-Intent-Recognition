@@ -1,9 +1,5 @@
 Get Weather,What is the weather like today?
-Get Weather City,What is the weather like in Paris today?
-Get Weather City,What is the weather like in Berlin today?
-Get Weather City,What is the weather like in New York today?
-Get Weather City,How is the weather in Pforzheim tomorrow?
-Get Weather City,Is the weather good in Munich now?
+Get Weather,what is the temperature today?
 Get Weather,what is the weather like tomorrow
 Get Weather,what is the weather like in the evening
 Get Weather,Is the weather good today?
@@ -13,10 +9,25 @@ Get Weather,Is it sunny?
 Get Weather,will it rain tomorrow?
 Get Weather,will it sunny today?
 Get Weather,Is it warm in stuttgat?
+Get Weather City,What is the weather like in Paris today?
+Get Weather City,What is the weather like in Berlin today?
+Get Weather City,What is the weather like in New York today?
+Get Weather City,How is the weather in Pforzheim tomorrow?
+Get Weather City,Is the weather good in Munich now?
+Get Weather City,Will it rain today in Stuttgart?
+Get Weather City,Will it be sunny today in Prague?
+Get Weather City,Is it snowing in Beijing?
+Get Weather City,What is the temperature in Rome?
+Get Weather City,Is it cloudy in Bangalore now?
 Check calendar,Am I free at 13:00 PM tomorrow?
 Check calendar,what time do I have the meeting tomorrow
 Check calendar,Do I have any apointments for today?
+Check calendar,Do I have a meeting today?
 Check calendar,How does my calender look like?
 Check calendar,When do I have the meeting?
-Get Fact,Tell me an interesting fact.
+Check calendar,Do I have a meeting at 13:00 PM today?
+Get Fact,Tell me an interesting fact
+Get Fact,Tell me a fact.
 Get Fact,Do you want to hear an interesting fact?
+Get Fact,Do you want to hear something interesting ?
+Get Fact,Tell me somethiing
