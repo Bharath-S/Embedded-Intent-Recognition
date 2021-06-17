@@ -1,5 +1,10 @@
 #include "CsvReader.h"
 
+/**
+ * Constructor, parses the sentences in the file
+ * Args: 
+ *     sFile - string value indicating the path of the data file
+ */
 CsvReader::CsvReader(std::string sFile)
 {
     std::ifstream fin(sFile,  std::ifstream::in);
@@ -10,7 +15,7 @@ CsvReader::CsvReader(std::string sFile)
     std::string line;
     std::string delimiter = ",";
     std::string intent, value;
-    
+
     while(std::getline(fin, line))
     {
         std::stringstream ss(line);
@@ -31,11 +36,23 @@ CsvReader::CsvReader(std::string sFile)
     fin.close();
 }
 
+/**
+ * Returns a map datastructure containing intent->sentence pair
+ *
+ * Return: 
+ *     map - Intent->Reference Sentence pair
+ */
 std::map< std::string, std::vector<std::string> > CsvReader::mapGetReference()
 {
     return m_mapData;
 }
 
+/**
+ * Returns a vector datastructure containing all the sentences in the data file
+ *
+ * Return: 
+ *     std::vector - contains the sentences read from the data file
+ */
 std::vector<std::string>  CsvReader::vecGetStrings()
 {
     std::vector<std::string> vReferenceStr;

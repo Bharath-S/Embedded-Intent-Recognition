@@ -2,6 +2,11 @@
 
 using namespace std;
 
+/**
+ * Parameterized Constructor, reads the data from the data file
+ * Args: 
+ *     strFileName - Path of the data file
+ */
 EmdIntentRecognizer::EmdIntentRecognizer(std::string strFileName)
 {
     CsvReader fReferenceData(strFileName);
@@ -10,6 +15,14 @@ EmdIntentRecognizer::EmdIntentRecognizer(std::string strFileName)
     m_vecReferenceData = fReferenceData.vecGetStrings();
 }
 
+
+/**
+ * Parses the string to a list of words
+ * Args: 
+ *     bigString - Sentence to be split into words
+ * Return: 
+ *     A vector of words
+ */
 std::vector<std::string> EmdIntentRecognizer::textParse(std::string & bigString)
 {
     std::vector<std::string> vec;
@@ -21,7 +34,11 @@ std::vector<std::string> EmdIntentRecognizer::textParse(std::string & bigString)
     return vec;
 }
 
-
+/**
+ * Creates a vocabulary list by taking the reference sentences as input
+ * Args: 
+ *     rawDataSet - A vector of strings reads from the data file
+ */
 void EmdIntentRecognizer::createVocabList(std::vector<std::vector<std::string>> rawDataSet)
 {
     std::set<std::string> vocabListSet;
@@ -33,6 +50,13 @@ void EmdIntentRecognizer::createVocabList(std::vector<std::vector<std::string>> 
     std::copy(vocabListSet.begin(), vocabListSet.end(), std::back_inserter(vocabList));
 }
 
+/**
+ * Converts the list of words to a vector 
+ * Args: 
+ *     inputSet - List of words parsed earlier by the textparser
+ * Return: 
+ *     A vector representing the list of words
+ */
 std::vector<double> EmdIntentRecognizer::bagOfWords2VecMN(std::vector<std::string> & inputSet)
 {
     std::vector<double> returnVec(vocabList.size(), 0);
@@ -45,6 +69,13 @@ std::vector<double> EmdIntentRecognizer::bagOfWords2VecMN(std::vector<std::strin
     return returnVec;
 }
 
+/**
+ * Converts the list of strings to a list of vectors
+ * Args: 
+ *     rawDataSet - List of sentences read from the data file
+ * Return: 
+ *     A list of vectors
+ */
 auto EmdIntentRecognizer::vec2mat(std::vector<std::vector<std::string>> rawDataSet)
 {
     createVocabList(rawDataSet);
@@ -59,6 +90,14 @@ auto EmdIntentRecognizer::vec2mat(std::vector<std::vector<std::string>> rawDataS
     return dataMat;
 }
 
+/**
+ * Calculates the cosine similarity between 2 vectors
+ * Args: 
+ *     v1 - input vector 1
+ *     v2 - input vector 2
+ * Return: 
+ *     Similaity value
+ */
 double EmdIntentRecognizer::cosine_similarity(std::vector<double> &v1, std::vector<double> &v2)
 {
     double d1, d2, d3 = 0;
@@ -72,7 +111,13 @@ double EmdIntentRecognizer::cosine_similarity(std::vector<double> &v1, std::vect
     return d1 / (sqrt(d2) * sqrt(d3));
 }
 
-
+/**
+ * Calculates the count of the terms in a vector
+ * Args: 
+ *     data - A vector after being converted from list of words
+ * Return: 
+ *     Count of the number of terms in the vector
+ */
 std::vector<double> EmdIntentRecognizer::get_term_count(std::vector<std::vector<double>> data)
 {
     std::vector<double> term_count(data[0].size(), 0);
@@ -87,6 +132,11 @@ std::vector<double> EmdIntentRecognizer::get_term_count(std::vector<std::vector<
     return term_count;
 }
 
+/**
+ * Generates the Inverse Document Frequecy
+ * Args: 
+ *     data - A list of vectors after being converted from list of sentences
+ */
 void EmdIntentRecognizer::vGenIDF(std::vector< std::vector<double>> data)
 {
     auto val = get_term_count(data);
@@ -100,7 +150,13 @@ void EmdIntentRecognizer::vGenIDF(std::vector< std::vector<double>> data)
     mIDF = ret;
 }
 
-
+/**
+ * Calculates the term frequency in a vector
+ * Args: 
+ *     data - A vector after being converted from list of words
+ * Return: 
+ *     A vector containing the frequency of terms
+ */
 std::vector<double> EmdIntentRecognizer::get_tf(std::vector<double> data)
 {
     double size = 0;
@@ -118,7 +174,13 @@ std::vector<double> EmdIntentRecognizer::get_tf(std::vector<double> data)
     return ret;
 }
 
-
+/**
+ * Multiplies the term frequency with the inverse document frequency
+ * Args: 
+ *     vecData - A vector after being converted from list of words
+ * Return: 
+ *     A vector containing the product -> tf*idf
+ */
 std::vector<double> EmdIntentRecognizer::vecIdfMutiplier(std::vector<double> vecData)
 {
     std::vector<double> vecProcessedData;
@@ -135,6 +197,12 @@ std::vector<double> EmdIntentRecognizer::vecIdfMutiplier(std::vector<double> vec
     return vecProcessedData;
 }
 
+/**
+ * Parse all the sentences to a list of list of words
+ *
+ * Return: 
+ *     A list of list of words after being parsed using textparse
+ */
 std::vector<std::vector<std::string>> EmdIntentRecognizer::vecParseReferenceData()
 {
     std::vector<std::vector<std::string>> vecParsedData;
@@ -146,6 +214,9 @@ std::vector<std::vector<std::string>> EmdIntentRecognizer::vecParseReferenceData
     return vecParsedData;
 }
 
+/**
+ * A builder method that builds the object to enable tf-idf methodology
+ */
 void EmdIntentRecognizer::vBuild()
 {
     auto processeData = vecParseReferenceData();
@@ -153,6 +224,14 @@ void EmdIntentRecognizer::vBuild()
     vGenIDF(dataMat);
 }
 
+/**
+ * Calculates the tf-idf similarity between 2 strings
+ * Args: 
+ *     strInp - Input sentence 1
+ *     strReference - Input sentence 2
+ * Return: 
+ *     double - Similarity value calculated by tf-idf methodology using cosine similarity
+ */
 double EmdIntentRecognizer::dGetSimilarity(std::string strInp, std::string strReference)
 {
     boost::algorithm::to_lower(strInp);
@@ -178,6 +257,13 @@ double EmdIntentRecognizer::dGetSimilarity(std::string strInp, std::string strRe
     return dSim;
 }
 
+/**
+ * Detects the intent of the given sentence
+ * Args: 
+ *     strInput - The Input Sentence/Question
+ * Return: 
+ *     string - Detected Intent
+ */
 std::string EmdIntentRecognizer::strGetIntent(std::string strInput)
 {
     std::string strIntent = "No Intent Recognised";
