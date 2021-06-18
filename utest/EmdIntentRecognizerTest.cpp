@@ -56,6 +56,55 @@ TEST(EmdIntentRecognizerTest, vecGetTf)
     ASSERT_EQ(vecExp, oEIR.vecGetTf(vecInput));
 }
 
+TEST(EmdIntentRecognizerTest, dGetSimilarity) 
+{ 
+    EmdIntentRecognizer oEIR("../data/Reference.csv");
+    oEIR.vBuild();
+    ASSERT_EQ(1, oEIR.dGetSimilarity("What is the weather like today", "What is the weather like today"));
+}
+
+TEST(EmdIntentRecognizerTest, vBuild) 
+{ 
+    EmdIntentRecognizer oEIR("../data/Reference.csv");
+    ASSERT_TRUE(oEIR.mIDF.empty());
+    oEIR.vBuild();
+    ASSERT_FALSE(oEIR.mIDF.empty());
+}
+
+TEST(EmdIntentRecognizerTest, vecIdfMutiplier) 
+{ 
+    EmdIntentRecognizer oEIR("../data/Reference.csv");
+    oEIR.vBuild();
+    std::vector<double> vecInput(oEIR.mIDF.size(),1) ;
+    std::vector<double> vecTF = oEIR.vecGetTf(vecInput);
+    std::vector<double> vecTDF = oEIR.mIDF;
+    
+    std::vector<double> vecProcessedData;
+    for(int i =0; i< vecTF.size(); i++)
+        vecProcessedData.push_back(vecTF.at(i)*vecTDF.at(i));
+    
+    ASSERT_EQ(vecProcessedData, oEIR.vecIdfMutiplier(vecTF) );
+}
+
+TEST(EmdIntentRecognizerTest, vGenIDF) 
+{ 
+    EmdIntentRecognizer oEIR("../data/Reference.csv");
+    oEIR.vBuild();
+    std::vector<std::vector<double>> vfvInput;
+    vfvInput.push_back({2.0,0.0,0.0,2.0,1.0});
+    
+    std::vector<double> vecTF = oEIR.vecGetTermCount(vfvInput);
+    std::vector<double> vecTDF = oEIR.mIDF;
+    
+    std::vector<double> vecExp;
+    double row = (double)vfvInput.size();
+    for(auto temp: vecTF)
+        vecExp.push_back(log(row/temp));
+
+    oEIR.vGenIDF(vfvInput);
+    ASSERT_EQ(vecExp, oEIR.mIDF);
+}
+
 
 int main(int argc, char **argv) 
 {
