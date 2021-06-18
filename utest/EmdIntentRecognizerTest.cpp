@@ -1,6 +1,6 @@
-//#define private public
+#define TESTING
 #include "../header/EmdIntentRecognizer.h"
-//#undef private
+#undef TESTING
 
 #include <gtest/gtest.h>
 

@@ -33,12 +33,21 @@
 
 #define assertm(exp, msg) assert(((void)msg, exp))
 
+// This is a hack to make the private members be accessible for unit test cases, there are better methods to do this
+// and the current method to be avoided
+#ifdef TESTING
+#define PRIVATE_TESTABLE public
+#else
+#define PRIVATE_TESTABLE private
+#endif
+
+
 using namespace std;
 
 class EmdIntentRecognizer 
 {
 
-    public:
+    PRIVATE_TESTABLE:
 
         // Member variables
         std::vector<std::vector<double>> m_vfvDataMat;
