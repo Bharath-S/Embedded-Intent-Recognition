@@ -75,6 +75,12 @@ class EmdIntentRecognizer
         vector<double> vecGetTermCount(vector<vector<double>> data);
 
     public:
+    
+        // Default Construcor -> Prohibited from being invoked
+        EmdIntentRecognizer() = delete;
+        
+        // Copy Construcor -> Prohibited from being invoked
+        EmdIntentRecognizer(const EmdIntentRecognizer&) = delete;
 
         // Parameterized Contructor
         EmdIntentRecognizer(std::string strFileName);

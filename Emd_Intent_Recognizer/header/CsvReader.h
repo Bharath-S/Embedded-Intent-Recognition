@@ -28,8 +28,14 @@ class CsvReader
         std::map< std::string, std::vector<std::string> > m_mapData;
 
     public:
+    
+        // Default Construcor -> Prohibited from being invoked
+        CsvReader() = delete;
+        
+        // Copy Construcor -> Prohibited from being invoked
+        CsvReader(const CsvReader&) = delete;
 
-        // Constructor
+        // Parameterized Constructor
         CsvReader(std::string sFile);
 
         // Returns the reference string as map datastructure with key->value pair
