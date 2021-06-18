@@ -29,6 +29,9 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
 #include "CsvReader.h"
+#include <cassert>
+
+#define assertm(exp, msg) assert(((void)msg, exp))
 
 using namespace std;
 

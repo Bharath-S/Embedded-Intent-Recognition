@@ -25,9 +25,12 @@ EmdIntentRecognizer::EmdIntentRecognizer(std::string strFileName)
 std::vector<std::string> EmdIntentRecognizer::vecParseText(std::string & strInput)
 {
     std::vector<std::string> vecTok;
-    boost::tokenizer<> tok(strInput);
-    for(boost::tokenizer<>::iterator itr = tok.begin(); itr != tok.end(); ++ itr)
-        vecTok.push_back(*itr);
+    if(!strInput.empty())
+    {
+        boost::tokenizer<> tok(strInput);
+        for(boost::tokenizer<>::iterator itr = tok.begin(); itr != tok.end(); ++ itr)
+            vecTok.push_back(*itr);
+    }
     return vecTok;
 }
 
@@ -95,6 +98,9 @@ std::vector<std::vector<double>> EmdIntentRecognizer::vfvVector2Mat(std::vector<
  */
 double EmdIntentRecognizer::dGetCosineSimilarity(std::vector<double> &vecData1, std::vector<double> &vecData2)
 {
+
+    assertm(vecData1.size()==vecData2.size(), "Error in dGetCosineSimilarity, Please check the Input and the reference data file");
+    
     double d1, d2, d3 = 0;
     unsigned int len = vecData1.size();
     for (unsigned int i = 0; i < len; ++i)
@@ -115,13 +121,15 @@ double EmdIntentRecognizer::dGetCosineSimilarity(std::vector<double> &vecData1, 
  */
 std::vector<double> EmdIntentRecognizer::vecGetTermCount(std::vector<std::vector<double>> vfvData)
 {
-    std::vector<double> term_count(vfvData[0].size(), 0);
+    assertm(!vfvData.empty(), "Error in vecGetTermCount, Please check the Input and the reference data file");
+    
+    std::vector<double> term_count(vfvData.at(0).size(), 0);
     for(int i=0; i<vfvData.size(); i++)
     {
-        for(int j=0; j<vfvData[i].size(); j++)
+        for(int j=0; j<vfvData.at(i).size(); j++)
         {
-            auto val = vfvData[i][j]>1? 1: vfvData[i][j];
-            term_count[j]+=val;
+            auto val = vfvData.at(i).at(j)>1? 1: vfvData.at(i).at(j);
+            term_count.at(j)+=val;
         }
     }
     return term_count;
@@ -134,6 +142,8 @@ std::vector<double> EmdIntentRecognizer::vecGetTermCount(std::vector<std::vector
  */
 void EmdIntentRecognizer::vGenIDF(std::vector< std::vector<double>> data)
 {
+    assertm(!data.empty(), "Error in vGenIDF, Please check the Input and the reference data file");
+    
     auto val = vecGetTermCount(data);
     std::vector<double> ret;
     double row = (double)data.size();
@@ -152,6 +162,8 @@ void EmdIntentRecognizer::vGenIDF(std::vector< std::vector<double>> data)
  */
 std::vector<double> EmdIntentRecognizer::vecGetTf(std::vector<double> data)
 {
+    assertm(!data.empty(), "Error in vecGetTf, Please check the Input and the reference data file");
+    
     double size = 0;
     for(double val: data)
         size+= val;
@@ -172,17 +184,11 @@ std::vector<double> EmdIntentRecognizer::vecGetTf(std::vector<double> data)
  */
 std::vector<double> EmdIntentRecognizer::vecIdfMutiplier(std::vector<double> vecData)
 {
+    assertm(mIDF.size()==vecData.size(), "Error in vecIdfMutiplier, Please check the Input and the reference data file");
+    
     std::vector<double> vecProcessedData;
-    if(mIDF.size()!=vecData.size())
-    {
-        std::cout<<"The input is wrong" << std::endl;
-        return vecProcessedData;
-    }
-
     for(int i =0; i< vecData.size(); i++)
-    {
         vecProcessedData.push_back(vecData[i]*mIDF[i]);
-    }
     return vecProcessedData;
 }
 
@@ -193,7 +199,7 @@ std::vector<double> EmdIntentRecognizer::vecIdfMutiplier(std::vector<double> vec
  *     A list of list of words after being parsed using vecParseText
  */
 std::vector<std::vector<std::string>> EmdIntentRecognizer::vecParseReferenceData()
-{
+{  
     std::vector<std::vector<std::string>> vecParsedData;
     for(auto strElem: m_vecReferenceData)
         vecParsedData.push_back( vecParseText(strElem) );
@@ -221,6 +227,8 @@ void EmdIntentRecognizer::vBuild()
  */
 double EmdIntentRecognizer::dGetSimilarity(std::string strInp, std::string strReference)
 {
+    assertm(( (!strInp.empty()) && (!strReference.empty())), "Error in dGetSimilarity, Please check the Input and the reference data file");
+    
     boost::algorithm::to_lower(strInp);
     boost::algorithm::to_lower(strReference);
 
@@ -252,6 +260,10 @@ double EmdIntentRecognizer::dGetSimilarity(std::string strInp, std::string strRe
 std::string EmdIntentRecognizer::strGetIntent(std::string strInput)
 {
     std::string strIntent = "No Intent Recognised";
+    if(strInput.empty())
+    {
+        std::cout<< "Please input a valid sentence" << std::endl; 
+    }
     double sim = 0;
     for(auto & vecStr: m_mapReferenceData)
     {
